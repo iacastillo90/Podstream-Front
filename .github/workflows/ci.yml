@@ -1,0 +1,70 @@
+name: Frontend CI/CD & Auto-Refactor
+
+on:
+  push:
+    branches: ['main', 'master']
+  pull_request:
+    branches: ['main', 'master']
+
+jobs:
+  code-quality:
+    name: Lint, Format & Auto-Fix
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Lint Fix
+        run: npm run lint
+
+      - name: Run Prettier Format
+        run: npm run format
+
+      - name: Commit & Push changes
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'chore: auto-fix linting and formatting issues [skip ci]'
+          branch: ${{ github.head_ref }}
+
+  verification:
+    name: Test & Build
+    needs: code-quality
+    runs-on: ubuntu-latest
+    if: always() # Run even if code-quality commits changes (which might be seen as 'failure' or cancellation by some triggers, but usually fine)
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type Check (TypeScript)
+        run: npm run type-check
+
+      - name: Unit Tests
+        run: npm run test:unit
+
+      - name: Build Production
+        run: npm run build-only

@@ -1,0 +1,43 @@
+{
+  "outputDir": "./docs",
+  "outputFileName": "project-documentation",
+  "exclude": [
+    "node_modules/**",
+    "dist/**",
+    "build/**",
+    ".git/**",
+    ".vscode/**",
+    "coverage/**",
+    "*.lock",
+    "*.log",
+    ".DS_Store",
+    "Thumbs.db",
+    "*.min.js",
+    "*.min.css",
+    "*.map",
+    "docs/**"
+  ],
+  "binaryExtensions": [
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".gif",
+    ".ico",
+    ".svg",
+    ".webp",
+    ".mp4",
+    ".webm",
+    ".mp3",
+    ".wav",
+    ".woff",
+    ".woff2",
+    ".ttf",
+    ".eot",
+    ".pdf",
+    ".zip",
+    ".tar",
+    ".gz"
+  ],
+  "maxFileSize": 1048576,
+  "includeMetadata": true
+}
