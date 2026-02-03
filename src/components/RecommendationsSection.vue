@@ -35,15 +35,30 @@
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent, type PropType } from 'vue'
+
+interface Product {
+  id: number | string
+  name: string
+  image: string
+  rating: number
+  reviews: number
+  price: number | string
+}
+
+export default defineComponent({
   props: {
-    recommendedProducts: Array,
+    recommendedProducts: {
+      type: Array as PropType<Product[]>,
+      default: () => [],
+    },
   },
+  emits: ['add-to-cart'],
   methods: {
-    addToCart(product) {
+    addToCart(product: Product) {
       this.$emit('add-to-cart', product)
     },
   },
-}
+})
 </script>

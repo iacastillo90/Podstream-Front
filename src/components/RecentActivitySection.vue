@@ -14,10 +14,20 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    recentActivity: Array,
-  },
+<script lang="ts">
+import { defineComponent, type PropType } from 'vue'
+
+interface Activity {
+  text: string
+  date: string
 }
+
+export default defineComponent({
+  props: {
+    recentActivity: {
+      type: Array as PropType<Activity[]>,
+      default: () => [],
+    },
+  },
+})
 </script>

@@ -114,7 +114,7 @@
             Explora las categorías que hemos preparado para ti y encuentra tu sonido ideal.
           </p>
           <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <AnimatedButton @click="$router.push('/products')" variant="primary">
+            <AnimatedButton variant="primary" @click="$router.push('/products')">
               Ver Catálogo
             </AnimatedButton>
             <button

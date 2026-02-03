@@ -59,10 +59,10 @@ const onFileChange = async (event: Event) => {
         >
           <input
             type="file"
-            @change="onFileChange"
             accept="image/*"
             class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
             :disabled="isUploading"
+            @change="onFileChange"
           />
 
           <div v-if="!previewUrl" class="text-center space-y-2 pointer-events-none">

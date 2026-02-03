@@ -66,6 +66,7 @@
           class="p-8 text-gray-200 leading-relaxed space-y-4 min-h-[150px] prose prose-invert max-w-none"
         >
           <!-- Render content as HTML (sanitize in real app!) -->
+          <!-- eslint-disable-next-line vue/no-v-html -->
           <div v-if="topic.content" v-html="topic.content"></div>
           <p v-else class="text-gray-400 italic">Sin contenido disponible</p>
         </div>
@@ -113,6 +114,7 @@
                 <span>{{ post.createdAt }}</span>
                 <span class="font-mono">#{{ post.id }}</span>
               </div>
+              <!-- eslint-disable-next-line vue/no-v-html -->
               <div
                 class="text-gray-300 prose prose-invert max-w-none mb-4"
                 v-html="post.content"

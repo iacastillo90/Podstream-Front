@@ -21,12 +21,23 @@
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   props: {
-    userName: String,
-    pendingOrders: Number,
-    cartItems: Number,
+    userName: {
+      type: String,
+      default: 'Usuario',
+    },
+    pendingOrders: {
+      type: Number,
+      default: 0,
+    },
+    cartItems: {
+      type: Number,
+      default: 0,
+    },
   },
-}
+})
 </script>

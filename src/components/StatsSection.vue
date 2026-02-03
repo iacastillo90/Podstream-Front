@@ -14,10 +14,21 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    stats: Array,
-  },
+<script lang="ts">
+import { defineComponent, type PropType } from 'vue'
+
+interface Stat {
+  title: string
+  value: string | number
+  icon: string
 }
+
+export default defineComponent({
+  props: {
+    stats: {
+      type: Array as PropType<Stat[]>,
+      default: () => [],
+    },
+  },
+})
 </script>

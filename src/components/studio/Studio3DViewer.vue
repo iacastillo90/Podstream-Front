@@ -43,7 +43,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import type { StudioItem } from '@/types'
 
 interface Props {
-  items: StudioItem[]
+  items?: StudioItem[]
   selectedItemId?: number | string | null
   viewMode?: '2D' | '3D'
 }

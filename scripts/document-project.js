@@ -2,10 +2,6 @@
 
 import fs from 'fs'
 import path from 'path'
-import { fileURLToPath } from 'url'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
 
 // Configuration
 const DEFAULT_CONFIG = {
@@ -58,7 +54,7 @@ function loadConfig() {
     try {
       const customConfig = JSON.parse(fs.readFileSync(configPath, 'utf-8'))
       return { ...DEFAULT_CONFIG, ...customConfig }
-    } catch (error) {
+    } catch {
       console.warn('⚠️  Error loading .documentrc.json, using default config')
       return DEFAULT_CONFIG
     }
@@ -130,7 +126,7 @@ function traverseDirectory(dir, config, projectRoot, fileList = []) {
 }
 
 // Generate file tree structure
-function generateFileTree(files, projectRoot) {
+function generateFileTree(files) {
   const tree = {}
 
   files.forEach((file) => {
@@ -147,7 +143,7 @@ function generateFileTree(files, projectRoot) {
     })
   })
 
-  function printTree(node, prefix = '', isLast = true) {
+  function printTree(node, prefix = '') {
     const entries = Object.entries(node)
     let output = ''
 

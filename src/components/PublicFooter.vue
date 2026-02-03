@@ -111,7 +111,7 @@
             Únete a nuestra comunidad VIP y recibe ofertas exclusivas antes que nadie.
           </p>
 
-          <form @submit.prevent="handleNewsletterSubmit" class="relative group">
+          <form class="relative group" @submit.prevent="handleNewsletterSubmit">
             <div
               class="absolute inset-0 bg-gradient-to-r from-brand-purple to-brand-blue rounded-xl opacity-20 group-hover:opacity-30 blur transition-opacity"
             ></div>

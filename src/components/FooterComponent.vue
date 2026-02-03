@@ -44,10 +44,21 @@
   </footer>
 </template>
 
-<script>
-export default {
-  props: {
-    footerLinks: Array,
-  },
+<script lang="ts">
+import { defineComponent, type PropType } from 'vue'
+
+interface FooterLink {
+  id: number | string
+  route: string
+  name: string
 }
+
+export default defineComponent({
+  props: {
+    footerLinks: {
+      type: Array as PropType<FooterLink[]>,
+      default: () => [],
+    },
+  },
+})
 </script>

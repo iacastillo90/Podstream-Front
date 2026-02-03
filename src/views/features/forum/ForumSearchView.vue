@@ -29,8 +29,8 @@
             </h3>
             <button
               v-if="hasActiveFilters"
-              @click="clearFilters"
               class="text-xs text-brand-pink hover:underline"
+              @click="clearFilters"
             >
               Limpiar
             </button>
@@ -56,8 +56,8 @@
             <div class="space-y-2">
               <label class="flex items-center gap-2 cursor-pointer">
                 <input
-                  type="radio"
                   v-model="filters.dateRange"
+                  type="radio"
                   value="ALL"
                   class="text-brand-purple focus:ring-brand-purple bg-black/20 border-white/10"
                 />
@@ -65,8 +65,8 @@
               </label>
               <label class="flex items-center gap-2 cursor-pointer">
                 <input
-                  type="radio"
                   v-model="filters.dateRange"
+                  type="radio"
                   value="MONTH"
                   class="text-brand-purple focus:ring-brand-purple bg-black/20 border-white/10"
                 />
@@ -74,8 +74,8 @@
               </label>
               <label class="flex items-center gap-2 cursor-pointer">
                 <input
-                  type="radio"
                   v-model="filters.dateRange"
+                  type="radio"
                   value="WEEK"
                   class="text-brand-purple focus:ring-brand-purple bg-black/20 border-white/10"
                 />
