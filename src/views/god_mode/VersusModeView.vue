@@ -33,12 +33,12 @@
         >
           <div
             v-for="prod in store.availableProducts"
-            :key="(prod as { id: number | string }).id"
+            :key="prod.id"
             class="px-4 py-3 hover:bg-white/5 cursor-pointer flex items-center gap-3 border-b border-white/5 last:border-0"
-            @click="store.addProduct((prod as { id: number | string }).id)"
+            @click="store.addProduct(prod.id)"
           >
-            <img :src="(prod as { image: string }).image" class="w-8 h-8 object-contain" />
-            <span class="text-sm font-bold">{{ (prod as { name: string }).name }}</span>
+            <img :src="prod.image" class="w-8 h-8 object-contain" />
+            <span class="text-sm font-bold">{{ prod.name }}</span>
           </div>
         </div>
       </div>

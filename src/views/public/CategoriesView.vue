@@ -64,14 +64,19 @@ const fetchCategories = async () => {
   try {
     const response = await categoryService.getAll()
     // Handle unwrapped vs wrapped response
-    const rawData = Array.isArray(response) ? response : (response as any).data || []
+    const rawData = Array.isArray(response)
+      ? response
+      : (response as { data: unknown[] }).data || []
 
-    categories.value = rawData.map((cat: any) => ({
-      ...cat,
-      // Fallback description if backend doesn't provide one
-      description: cat.description || `Explora nuestra colección de ${cat.name}`,
-      image: getFullImageUrl(cat.image),
-    }))
+    categories.value = rawData.map((cat) => {
+      const c = cat as { name: string; description?: string; image?: string }
+      return {
+        ...cat,
+        // Fallback description if backend doesn't provide one
+        description: c.description || `Explora nuestra colección de ${c.name}`,
+        image: getFullImageUrl(c.image),
+      }
+    })
   } catch (error) {
     console.error('Error fetching categories:', error)
   } finally {

@@ -272,7 +272,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useStudioStore } from '@/stores/studio'
 import AnimatedButton from '@/components/ui/AnimatedButton.vue'
 import Studio3DViewer from '@/components/studio/Studio3DViewer.vue'
@@ -301,7 +301,7 @@ onMounted(() => {
   store.fetchCatalog()
 })
 
-const addToCanvas = (product: any) => {
+const addToCanvas = (product: unknown) => {
   store.addItem(product)
 }
 

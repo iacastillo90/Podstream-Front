@@ -704,11 +704,10 @@ const activeAccordionIndex = ref(0)
 const cardRefs = ref<Record<number, HTMLElement>>({})
 const imageRefs = ref<Record<number, HTMLElement>>({})
 
-const setCardRef = (el: any, id: number) => {
-  if (el) cardRefs.value[id] = el.$el // GlassCard is a component, need $el
-}
-const setImageRef = (el: any, id: number) => {
-  if (el) imageRefs.value[id] = el
+const setCardRef = (el: unknown, id: number) => {
+  if (el && typeof el === 'object' && '$el' in el) {
+    cardRefs.value[id] = (el as { $el: HTMLElement }).$el
+  }
 }
 
 const handleTilt = (e: MouseEvent, id: number) => {
@@ -810,13 +809,18 @@ const filteredBestSellers = computed(() => {
 
   // Filter by category ID or Name (Fallback for backend variations)
   return products.value
-    .filter((p: any) => {
-      const pCatId = p.category?.id || p.categoryId
+    .filter((p) => {
+      const pData = p as {
+        category?: { id?: number; name?: string }
+        categoryId?: number
+        categoryName?: string
+      }
+      const pCatId = pData.category?.id || pData.categoryId
       // If we have IDs to compare
       if (pCatId && cat.id) return pCatId === cat.id
 
       // Fallback: Compare names (Backend seems to return categoryName)
-      const pCatName = p.category?.name || p.categoryName
+      const pCatName = pData.category?.name || pData.categoryName
       return pCatName === cat.name
     })
     .slice(0, 8)
