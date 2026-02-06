@@ -10,7 +10,9 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, withDefaults } from 'vue'
+defineOptions({
+  name: 'SkeletonLoader',
+})
 
 interface Props {
   width?: string
