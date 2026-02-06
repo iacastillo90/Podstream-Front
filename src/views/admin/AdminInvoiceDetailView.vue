@@ -231,7 +231,7 @@ export default {
         clientEmail: '',
         clientAddress: '',
         date: '',
-        items: [],
+        items: [] as Array<{ name: string; quantity: number; price: number }>,
         subtotal: 0,
         taxes: 0,
         total: 0,

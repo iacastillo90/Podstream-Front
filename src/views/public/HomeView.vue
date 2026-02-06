@@ -834,14 +834,17 @@ const fetchFeaturedProducts = async () => {
     const rawData = Array.isArray(responseData) ? responseData : responseData.content || []
 
     // Fetch enough products for both sections
-    products.value = rawData.map((p: any) => ({
-      ...p,
-      image: getFullImageUrl(
-        p.image ||
-          (p.images && p.images.length > 0 ? p.images[0] : null) ||
-          (p.photos && p.photos.length > 0 ? p.photos[0] : null),
-      ),
-    }))
+    products.value = rawData.map((p: unknown) => {
+      const prod = p as { image?: string; images?: string[]; photos?: string[] }
+      return {
+        ...(p as Record<string, unknown>),
+        image: getFullImageUrl(
+          prod.image ||
+            (prod.images && prod.images.length > 0 ? prod.images[0] : null) ||
+            (prod.photos && prod.photos.length > 0 ? prod.photos[0] : null),
+        ),
+      }
+    })
   } catch (error) {
     console.error('Error fetching featured products:', error)
   }
@@ -854,22 +857,26 @@ const fetchCategories = async () => {
     const rawData = Array.isArray(responseData) ? responseData : responseData.content || []
 
     // Sort logic? Maybe random or by ID.
-    categories.value = rawData.map((c: any) => ({
-      ...c,
-      image: getFullImageUrl(c.image),
-    }))
+    categories.value = rawData.map((c: unknown) => {
+      const cat = c as { image?: string }
+      return {
+        ...(c as Record<string, unknown>),
+        image: getFullImageUrl(cat.image),
+      }
+    })
   } catch (error) {
     console.error('Error fetching categories:', error)
   }
 }
 
-const addToCart = (product: any) => {
+const addToCart = (product: unknown) => {
   console.log('Adding to cart', product)
   // Use store or emit event
 }
 
-const viewProductDetails = (product: any) => {
-  router.push(`/products/${product.id}`)
+const viewProductDetails = (product: unknown) => {
+  const prod = product as { id?: number }
+  router.push(`/products/${prod.id}`)
 }
 
 // Lifecycle

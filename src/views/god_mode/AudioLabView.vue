@@ -198,7 +198,6 @@ const drawVisualizer = () => {
     const h = Math.random() * height * 0.4 * (store.volume * 2) * noise
 
     const x = i * barWidth
-    const y = (height - h) / 2 // Center vertically
 
     // Mirror effect
     ctx.fillRect(x, height / 2 - h / 2, barWidth - 2, h)

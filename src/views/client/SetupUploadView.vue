@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { storageService } from '@/services/storageService'
-import AnimatedButton from '@/components/ui/AnimatedButton.vue'
 import GlassCard from '@/components/ui/GlassCard.vue'
 
 const uploadStatus = ref('')

@@ -149,8 +149,8 @@
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <ProductCard
           v-for="product in products"
-          :key="product.name"
-          :product="product"
+          :key="(product as { name?: string }).name"
+          :product="product as any"
           @add-to-cart="addToRecommendation"
           @view-details="viewRecommendation"
         />
@@ -178,7 +178,7 @@ const store = useCartStore()
 const authStore = useAuthStore()
 
 // For recommendations
-const products = ref<any[]>([])
+const products = ref<unknown[]>([])
 const isProcessingPayment = ref(false) // Loading state
 
 onMounted(async () => {
@@ -189,15 +189,18 @@ onMounted(async () => {
     const res = await ProductService.getAll()
     // Response is already unwrapped by interceptor.
     // Ensure we handle both array or Page object (with .content)
-    const rawData = Array.isArray(res) ? res : (res as any).content || []
-    products.value = rawData.slice(0, 3).map((p: any) => ({
-      ...p,
-      image: getFullImageUrl(
-        p.image ||
-          (p.images && p.images.length > 0 ? p.images[0] : null) ||
-          (p.photos && p.photos.length > 0 ? p.photos[0] : null),
-      ),
-    }))
+    const rawData = Array.isArray(res) ? res : (res as { content?: unknown[] }).content || []
+    products.value = rawData.slice(0, 3).map((p) => {
+      const prod = p as { image?: string; images?: string[]; photos?: string[] }
+      return {
+        ...p,
+        image: getFullImageUrl(
+          prod.image ||
+            (prod.images && prod.images.length > 0 ? prod.images[0] : null) ||
+            (prod.photos && prod.photos.length > 0 ? prod.photos[0] : null),
+        ),
+      }
+    })
   } catch (e) {
     console.error(e)
   }
@@ -224,13 +227,15 @@ const removeItem = (index: number) => {
   store.removeItem(item.productId)
 }
 
-const addToRecommendation = (product: any) => {
-  store.addItem(product, 1)
+const addToRecommendation = (product: unknown) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  store.addItem(product as any, 1)
 }
 
-const viewRecommendation = (product: any) => {
-  if (product.id) {
-    router.push(`/products/${product.id}`)
+const viewRecommendation = (product: unknown) => {
+  const prod = product as { id?: number }
+  if (prod.id) {
+    router.push(`/products/${prod.id}`)
   }
 }
 
