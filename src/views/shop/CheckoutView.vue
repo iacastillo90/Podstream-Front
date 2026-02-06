@@ -306,7 +306,7 @@ const fetchCart = async () => {
   try {
     const response = await api.get('/cart')
     // Assuming api returns unwrapped data
-    const cartData = response as any
+    const cartData = response as { items?: CartItem[]; totalPrice?: number }
     cartItems.value = cartData.items || []
     cartTotal.value = cartData.totalPrice || 0
   } catch (error) {
