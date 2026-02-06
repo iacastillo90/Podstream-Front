@@ -200,7 +200,7 @@ const props = defineProps<{
   categories: (Category & { count?: number })[]
   brands?: { name: string; count?: number }[] // Optional prop for now
   maxPriceLimit?: number // Max price found in current products
-  initialFilters?: any
+  initialFilters?: Record<string, unknown>
 }>()
 
 const emit = defineEmits(['update:filters', 'close'])

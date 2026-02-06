@@ -143,14 +143,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 import type { Product } from '@/types'
 
 const props = defineProps<{
   products: Product[]
 }>()
 
-const emit = defineEmits(['add-to-cart', 'view-details'])
+defineEmits(['add-to-cart', 'view-details'])
 
 const selectedIndex = ref(0)
 const rotationAngle = ref(0)

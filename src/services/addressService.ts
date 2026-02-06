@@ -27,7 +27,7 @@ export const AddressService = {
   },
 
   // Admin
-  async getAllAdmin(): Promise<any> {
-    return (await api.get('/admin/addresses')) as unknown as Promise<any>
+  async getAllAdmin(): Promise<unknown> {
+    return (await api.get('/admin/addresses')) as unknown
   },
 }

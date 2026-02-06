@@ -1,4 +1,4 @@
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive } from 'vue'
 import { ProductService } from '@/services/productService'
 import { storageService } from '@/services/storageService'
 import type { Product } from '@/types/product'
@@ -108,7 +108,7 @@ export function useProductForm() {
       }
     } catch (error) {
       console.error('Upload failed:', error)
-      const msg = (error as any)?.message || JSON.stringify(error)
+      const msg = (error as { message?: string })?.message || JSON.stringify(error)
       alert(`Error al subir la imagen: ${msg}`)
     } finally {
       uploadingIndexes[key] = false
@@ -137,7 +137,8 @@ export function useProductForm() {
       }
 
       // Cast to satisfy potentially looser API types or strict overlap
-      await ProductService.create(productPayload as any)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await ProductService.create(productPayload as unknown as any)
 
       alert(`Producto "${form.name}" creado con éxito.`)
       router.push('/admin/stock')

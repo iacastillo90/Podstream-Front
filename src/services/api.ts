@@ -1,4 +1,4 @@
-import axios, { type AxiosInstance, type AxiosResponse, AxiosError } from 'axios'
+import axios, { type AxiosInstance, AxiosError } from 'axios'
 import type { ApiResponse, AppError } from '@/types/api'
 import { useAuthStore } from '@/stores/auth'
 
@@ -55,12 +55,12 @@ api.interceptors.response.use(
     }
 
     // 2. Caso Auth/Legacy: Respuesta directa con token (backend no envuelve login todavía?)
-    if ((response.data as any)?.token) {
+    if ((response.data as { token?: unknown })?.token) {
       return response.data
     }
 
     // 3. Lax check for unwrapped objects (like User profile or Dashboard stats)
-    if ((response.data as any)?.id || response.config.url?.includes('/admin/stats')) {
+    if ((response.data as { id?: unknown })?.id || response.config.url?.includes('/admin/stats')) {
       return response.data
     }
 
@@ -116,7 +116,7 @@ export const ContactService = {
 
 export const ReviewService = {
   getAll: (productId: string) => api.get(`/products/${productId}/reviews`),
-  create: (productId: string, data: any) => api.post(`/products/${productId}/reviews`, data),
+  create: (productId: string, data: unknown) => api.post(`/products/${productId}/reviews`, data),
 }
 
 export const RecommendationService = {

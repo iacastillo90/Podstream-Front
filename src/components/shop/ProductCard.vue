@@ -103,7 +103,7 @@ defineProps<{
     tag?: string
     badge?: string
     description?: string
-    category?: { name: string; id?: any }
+    category?: { name: string; id?: number | string }
     categoryName?: string
   }
 }>()

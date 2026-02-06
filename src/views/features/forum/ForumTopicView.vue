@@ -114,11 +114,12 @@
                 <span>{{ post.createdAt }}</span>
                 <span class="font-mono">#{{ post.id }}</span>
               </div>
-              <!-- eslint-disable-next-line vue/no-v-html -->
+              <!-- eslint-disable vue/no-v-html -->
               <div
                 class="text-gray-300 prose prose-invert max-w-none mb-4"
                 v-html="post.content"
               ></div>
+              <!-- eslint-enable vue/no-v-html -->
 
               <div class="flex justify-end pt-4 border-t border-white/5">
                 <button
@@ -166,11 +167,9 @@ import AnimatedButton from '@/components/ui/AnimatedButton.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
 import { ForumService } from '@/services/forumService'
 import type { ForumTopic, ForumPost } from '@/types/forum'
-import { useAuthStore } from '@/stores/auth' // For identifying owner
 
 const route = useRoute()
 const router = useRouter()
-const authStore = useAuthStore()
 
 const topic = ref<ForumTopic | null>(null)
 const posts = ref<ForumPost[]>([])
