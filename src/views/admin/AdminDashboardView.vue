@@ -151,6 +151,7 @@ import GlassCard from '@/components/ui/GlassCard.vue'
 import AnimatedButton from '@/components/ui/AnimatedButton.vue'
 import { DashboardService } from '@/services/dashboardService'
 import { PromotionService } from '@/services/promotionService'
+import type { Promotion } from '@/types'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement)
 
@@ -196,7 +197,15 @@ const topClient = ref({
   purchases: 0,
 })
 
-const topProductData = ref<any>({
+const topProductData = ref<{
+  labels: string[]
+  datasets: Array<{
+    label: string
+    backgroundColor: string[]
+    borderRadius: number
+    data: number[]
+  }>
+}>({
   labels: [],
   datasets: [
     {
@@ -208,7 +217,14 @@ const topProductData = ref<any>({
   ],
 })
 
-const topForumData = ref<any>({
+const topForumData = ref<{
+  labels: string[]
+  datasets: Array<{
+    backgroundColor: string[]
+    borderColor: string
+    data: number[]
+  }>
+}>({
   labels: [],
   datasets: [
     {
@@ -223,24 +239,24 @@ const fetchDashboardStats = async () => {
   try {
     const response = await DashboardService.getStats()
     console.log('Dashboard Stats Response:', response) // Debug log
-    const data = response as any
+    const data = response as Record<string, unknown>
 
     // Update Stats Cards
-    stats.value[0].value = `$${data.totalIncome || 0}`
-    stats.value[0].growth = data.incomeGrowth || 0
+    stats.value[0].value = `$${(data.totalIncome as number) || 0}`
+    stats.value[0].growth = (data.incomeGrowth as number) || 0
 
-    stats.value[1].value = `${data.newClients || 0}`
-    stats.value[1].growth = data.clientsGrowth || 0
+    stats.value[1].value = `${(data.newClients as number) || 0}`
+    stats.value[1].growth = (data.clientsGrowth as number) || 0
 
-    stats.value[2].value = `${data.pendingOrders || 0}`
-    stats.value[2].growth = data.ordersGrowth || 0
+    stats.value[2].value = `${(data.pendingOrders as number) || 0}`
+    stats.value[2].growth = (data.ordersGrowth as number) || 0
 
-    stats.value[3].value = `${data.conversionRate || 0}%`
-    stats.value[3].growth = data.conversionGrowth || 0
+    stats.value[3].value = `${(data.conversionRate as number) || 0}%`
+    stats.value[3].growth = (data.conversionGrowth as number) || 0
 
     // Update Top Client
     if (data.topClient) {
-      topClient.value = data.topClient
+      topClient.value = data.topClient as { name: string; avatar: string; purchases: number }
     }
 
     // Update Charts
@@ -295,7 +311,7 @@ const createPromotion = async () => {
       endDate: promoForm.value.endDate,
       active: true,
       status: 'active',
-    } as any)
+    } as Omit<Promotion, 'id'>)
     alert(`Promoción "${promoForm.value.title}" enviada!`)
     promoForm.value = {
       title: '',

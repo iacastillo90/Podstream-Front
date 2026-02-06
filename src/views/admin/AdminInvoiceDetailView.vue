@@ -1,7 +1,9 @@
 <template>
   <div class="min-h-screen bg-black">
     <!-- Header -->
-    <header class="fixed top-0 w-full bg-black/90 backdrop-blur-sm z-50 border-b border-purple-500/20">
+    <header
+      class="fixed top-0 w-full bg-black/90 backdrop-blur-sm z-50 border-b border-purple-500/20"
+    >
       <div class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
         <div class="flex items-center space-x-3">
           <img
@@ -9,7 +11,9 @@
             alt="Logo"
             class="logo"
           />
-          <div class="text-3xl font-bold bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent">
+          <div
+            class="text-3xl font-bold bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent"
+          >
             PodStream
           </div>
         </div>
@@ -74,7 +78,8 @@
                 </div>
                 <div class="text-right">
                   <p><strong>Fecha:</strong> {{ invoice.date }}</p>
-                  <p><strong>Estado:</strong>
+                  <p>
+                    <strong>Estado:</strong>
                     <span
                       :class="{
                         'text-green-400': invoice.status === 'paid',
@@ -109,7 +114,11 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="(item, index) in invoice.items" :key="index" class="border-b border-gray-700 last:border-0">
+                  <tr
+                    v-for="(item, index) in invoice.items"
+                    :key="index"
+                    class="border-b border-gray-700 last:border-0"
+                  >
                     <td class="py-2">{{ item.name }}</td>
                     <td class="py-2">{{ item.quantity }}</td>
                     <td class="py-2">${{ item.price.toFixed(2) }}</td>
@@ -123,7 +132,9 @@
             <div class="text-right">
               <p><strong>Subtotal:</strong> ${{ invoice.subtotal.toFixed(2) }}</p>
               <p><strong>Impuestos (21% IVA):</strong> ${{ invoice.taxes.toFixed(2) }}</p>
-              <p class="text-xl font-semibold text-white"><strong>Total:</strong> ${{ invoice.total.toFixed(2) }}</p>
+              <p class="text-xl font-semibold text-white">
+                <strong>Total:</strong> ${{ invoice.total.toFixed(2) }}
+              </p>
             </div>
 
             <!-- Botón para Descargar -->
@@ -149,17 +160,15 @@
         <div>
           <h4 class="text-white text-lg font-semibold mb-4">Sobre PodStream</h4>
           <p class="text-gray-400">
-            Somos tu destino principal para equipos de podcast profesional. Calidad y servicio garantizado.
+            Somos tu destino principal para equipos de podcast profesional. Calidad y servicio
+            garantizado.
           </p>
         </div>
         <div>
           <h4 class="text-white text-lg font-semibold mb-4">Enlaces Rápidos</h4>
           <ul class="space-y-2">
             <li v-for="link in footerLinks" :key="link.id">
-              <router-link
-                :to="link.route"
-                class="hover:text-white transition-colors"
-              >
+              <router-link :to="link.route" class="hover:text-white transition-colors">
                 {{ link.name }}
               </router-link>
             </li>
@@ -193,142 +202,142 @@
   </div>
 </template>
 
-<script>
-import jsPDF from 'jspdf';
+<script lang="ts">
+import jsPDF from 'jspdf'
 
 export default {
   data() {
     return {
       cartCount: 3,
       menuItems: [
-        { id: 1, name: "Inicio", route: "/" },
-        { id: 2, name: "Productos", route: "/products" },
-        { id: 3, name: "Categorías", route: "/categories" },
-        { id: 4, name: "Sobre Nosotros", route: "/about" },
-        { id: 5, name: "Contacto", route: "/contact" },
-        { id: 6, name: "Carrito", route: "/cart" },
-        { id: 7, name: "Dashboard", route: "/dashboard" },
-        { id: 8, name: "Foro", route: "/forum" },
+        { id: 1, name: 'Inicio', route: '/' },
+        { id: 2, name: 'Productos', route: '/products' },
+        { id: 3, name: 'Categorías', route: '/categories' },
+        { id: 4, name: 'Sobre Nosotros', route: '/about' },
+        { id: 5, name: 'Contacto', route: '/contact' },
+        { id: 6, name: 'Carrito', route: '/cart' },
+        { id: 7, name: 'Dashboard', route: '/dashboard' },
+        { id: 8, name: 'Foro', route: '/forum' },
       ],
       footerLinks: [
-        { id: 1, name: "Productos", route: "/products" },
-        { id: 2, name: "Categorías", route: "/categories" },
-        { id: 3, name: "Contacto", route: "/contact" },
-        { id: 4, name: "Soporte", route: "/support" }, // Nota: No hay ruta para "support" aún
+        { id: 1, name: 'Productos', route: '/products' },
+        { id: 2, name: 'Categorías', route: '/categories' },
+        { id: 3, name: 'Contacto', route: '/contact' },
+        { id: 4, name: 'Soporte', route: '/support' }, // Nota: No hay ruta para "support" aún
       ],
       invoice: {
         id: this.$route.params.id,
-        clientName: "",
-        clientEmail: "",
-        clientAddress: "",
-        date: "",
+        clientName: '',
+        clientEmail: '',
+        clientAddress: '',
+        date: '',
         items: [],
         subtotal: 0,
         taxes: 0,
         total: 0,
-        status: "",
+        status: '',
       },
-    };
+    }
   },
   mounted() {
-    this.loadInvoice();
+    this.loadInvoice()
   },
   methods: {
     toggleCart() {
-      this.$router.push('/cart');
+      this.$router.push('/cart')
     },
     logout() {
-      console.log("Cerrando sesión");
-      this.$router.push('/login');
+      console.log('Cerrando sesión')
+      this.$router.push('/login')
     },
     loadInvoice() {
       const invoices = [
         {
-          id: "INV001",
-          clientName: "Carlos Rodríguez",
-          clientEmail: "carlos.rodriguez@example.com",
-          clientAddress: "Calle Falsa 123, Madrid",
-          date: "2025-01-15",
+          id: 'INV001',
+          clientName: 'Carlos Rodríguez',
+          clientEmail: 'carlos.rodriguez@example.com',
+          clientAddress: 'Calle Falsa 123, Madrid',
+          date: '2025-01-15',
           items: [
-            { name: "Micrófono XLR", quantity: 1, price: 299.99 },
-            { name: "Auriculares Pro", quantity: 1, price: 249.99 },
+            { name: 'Micrófono XLR', quantity: 1, price: 299.99 },
+            { name: 'Auriculares Pro', quantity: 1, price: 249.99 },
           ],
           subtotal: 549.98,
-          taxes: 115.50,
+          taxes: 115.5,
           total: 665.48,
-          status: "paid",
+          status: 'paid',
         },
         {
-          id: "INV002",
-          clientName: "Ana Gómez",
-          clientEmail: "ana.gomez@example.com",
-          clientAddress: "Avenida Siempre Viva 456, Barcelona",
-          date: "2024-12-20",
-          items: [
-            { name: "Interfaz USB", quantity: 1, price: 199.99 },
-          ],
+          id: 'INV002',
+          clientName: 'Ana Gómez',
+          clientEmail: 'ana.gomez@example.com',
+          clientAddress: 'Avenida Siempre Viva 456, Barcelona',
+          date: '2024-12-20',
+          items: [{ name: 'Interfaz USB', quantity: 1, price: 199.99 }],
           subtotal: 199.99,
-          taxes: 42.00,
+          taxes: 42.0,
           total: 241.99,
-          status: "pending",
+          status: 'pending',
         },
         {
-          id: "INV003",
-          clientName: "Luis Martínez",
-          clientEmail: "luis.martinez@example.com",
-          clientAddress: "Plaza Mayor 789, Valencia",
-          date: "2025-02-10",
-          items: [
-            { name: "Filtro Antipop", quantity: 2, price: 29.99 },
-          ],
+          id: 'INV003',
+          clientName: 'Luis Martínez',
+          clientEmail: 'luis.martinez@example.com',
+          clientAddress: 'Plaza Mayor 789, Valencia',
+          date: '2025-02-10',
+          items: [{ name: 'Filtro Antipop', quantity: 2, price: 29.99 }],
           subtotal: 59.98,
-          taxes: 12.60,
+          taxes: 12.6,
           total: 72.58,
-          status: "paid",
+          status: 'paid',
         },
-      ];
-      const invoice = invoices.find((inv) => inv.id === this.$route.params.id);
+      ]
+      const invoice = invoices.find((inv) => inv.id === this.$route.params.id)
       if (invoice) {
-        this.invoice = invoice;
+        this.invoice = invoice
       } else {
-        this.$router.push('/adminInvoice');
+        this.$router.push('/adminInvoice')
       }
     },
     downloadInvoice() {
-      const doc = new jsPDF();
-      doc.setFontSize(18);
-      doc.text('Boleta #' + this.invoice.id, 20, 20);
-      doc.setFontSize(12);
-      doc.text('PodStream', 20, 30);
-      doc.text('Calle Principal 123, Madrid', 20, 35);
-      doc.text('+34 900 123 456', 20, 40);
-      doc.text('info@podstream.es', 20, 45);
+      const doc = new jsPDF()
+      doc.setFontSize(18)
+      doc.text('Boleta #' + this.invoice.id, 20, 20)
+      doc.setFontSize(12)
+      doc.text('PodStream', 20, 30)
+      doc.text('Calle Principal 123, Madrid', 20, 35)
+      doc.text('+34 900 123 456', 20, 40)
+      doc.text('info@podstream.es', 20, 45)
 
-      doc.text(`Fecha: ${this.invoice.date}`, 140, 30);
-      doc.text(`Estado: ${this.invoice.status === 'paid' ? 'Pagada' : 'Pendiente'}`, 140, 35);
+      doc.text(`Fecha: ${this.invoice.date}`, 140, 30)
+      doc.text(`Estado: ${this.invoice.status === 'paid' ? 'Pagada' : 'Pendiente'}`, 140, 35)
 
-      doc.text('Facturado a:', 20, 60);
-      doc.text(this.invoice.clientName, 20, 65);
-      doc.text(this.invoice.clientAddress || 'Dirección no disponible', 20, 70);
-      doc.text(this.invoice.clientEmail || 'Email no disponible', 20, 75);
+      doc.text('Facturado a:', 20, 60)
+      doc.text(this.invoice.clientName, 20, 65)
+      doc.text(this.invoice.clientAddress || 'Dirección no disponible', 20, 70)
+      doc.text(this.invoice.clientEmail || 'Email no disponible', 20, 75)
 
-      doc.text('Productos Comprados:', 20, 90);
-      let y = 100;
+      doc.text('Productos Comprados:', 20, 90)
+      let y = 100
       this.invoice.items.forEach((item, index) => {
-        doc.text(`${index + 1}. ${item.name} - ${item.quantity} x $${item.price.toFixed(2)} = $${(item.quantity * item.price).toFixed(2)}`, 20, y);
-        y += 10;
-      });
+        doc.text(
+          `${index + 1}. ${item.name} - ${item.quantity} x $${item.price.toFixed(2)} = $${(item.quantity * item.price).toFixed(2)}`,
+          20,
+          y,
+        )
+        y += 10
+      })
 
-      y += 10;
-      doc.text(`Subtotal: $${this.invoice.subtotal.toFixed(2)}`, 140, y);
-      doc.text(`Impuestos (21% IVA): $${this.invoice.taxes.toFixed(2)}`, 140, y + 5);
-      doc.setFontSize(14);
-      doc.text(`Total: $${this.invoice.total.toFixed(2)}`, 140, y + 15);
+      y += 10
+      doc.text(`Subtotal: $${this.invoice.subtotal.toFixed(2)}`, 140, y)
+      doc.text(`Impuestos (21% IVA): $${this.invoice.taxes.toFixed(2)}`, 140, y + 5)
+      doc.setFontSize(14)
+      doc.text(`Total: $${this.invoice.total.toFixed(2)}`, 140, y + 15)
 
-      doc.save(`boleta_${this.invoice.id}.pdf`);
+      doc.save(`boleta_${this.invoice.id}.pdf`)
     },
   },
-};
+}
 </script>
 
 <style scoped>

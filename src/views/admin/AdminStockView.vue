@@ -416,8 +416,11 @@ const exportToExcel = () => {
 }
 
 const exportToPDF = () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const doc: any = new jsPDF()
+  const doc = new jsPDF() as unknown as {
+    text: (text: string, x: number, y: number) => void
+    autoTable: (options: unknown) => void
+    save: (filename: string) => void
+  }
   doc.text('Stock PodStream', 14, 10)
   doc.autoTable({
     head: [['Producto', 'Categoría', 'Stock']],

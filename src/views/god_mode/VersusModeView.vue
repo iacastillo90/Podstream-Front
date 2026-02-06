@@ -33,12 +33,12 @@
         >
           <div
             v-for="prod in store.availableProducts"
-            :key="prod.id"
+            :key="(prod as { id: number | string }).id"
             class="px-4 py-3 hover:bg-white/5 cursor-pointer flex items-center gap-3 border-b border-white/5 last:border-0"
-            @click="store.addProduct(prod.id)"
+            @click="store.addProduct((prod as { id: number | string }).id)"
           >
-            <img :src="prod.image" class="w-8 h-8 object-contain" />
-            <span class="text-sm font-bold">{{ prod.name }}</span>
+            <img :src="(prod as { image: string }).image" class="w-8 h-8 object-contain" />
+            <span class="text-sm font-bold">{{ (prod as { name: string }).name }}</span>
           </div>
         </div>
       </div>
@@ -184,7 +184,7 @@ const colors = ['#8b5cf6', '#3b82f6', '#ec4899'] // Purple, Blue, Pink
 const bgColors = ['rgba(139, 92, 246, 0.2)', 'rgba(59, 130, 246, 0.2)', 'rgba(236, 72, 153, 0.2)']
 
 const searchQuery = ref('')
-let debounceTimer: any
+let debounceTimer: ReturnType<typeof setTimeout> | undefined
 
 const handleSearch = () => {
   clearTimeout(debounceTimer)
@@ -247,7 +247,7 @@ const drawRadar = () => {
     ctx.beginPath()
     features.forEach((feat, i) => {
       const angle = i * angleStep - Math.PI / 2
-      const value = (prod.specs as any)[feat] / 100
+      const value = (prod.specs as Record<string, number>)[feat] / 100
       const radius = maxRadius * value
       const x = centerX + Math.cos(angle) * radius
       const y = centerY + Math.sin(angle) * radius

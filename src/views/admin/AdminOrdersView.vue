@@ -114,7 +114,7 @@ const fetchOrders = async () => {
   // In a real scenario, this should be AdminService.getAllOrders()
   // For now we reuse existing service, assuming backend filters by role or returns all for admin
   const res = await OrderService.getAll()
-  orders.value = Array.isArray(res) ? res : (res as any).data || []
+  orders.value = Array.isArray(res) ? res : ((res as { data: unknown }).data as Order[]) || []
 }
 
 onMounted(() => {

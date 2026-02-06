@@ -472,9 +472,11 @@ const saveProfile = async () => {
 
     // Reload profile data from backend to ensure we have the latest values
     await loadProfile()
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error updating profile:', error)
-    const message = error.response?.data?.message || 'Error al guardar los cambios'
+    const message =
+      (error as { response?: { data?: { message?: string } } }).response?.data?.message ||
+      'Error al guardar los cambios'
     uiStore.showToast(message, 'error')
   } finally {
     isSaving.value = false
@@ -499,9 +501,11 @@ const handleChangePassword = async () => {
     passwordForm.currentPassword = ''
     passwordForm.newPassword = ''
     passwordForm.confirmPassword = ''
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error changing password:', error)
-    const message = error.response?.data?.message || 'Error al cambiar la contraseña'
+    const message =
+      (error as { response?: { data?: { message?: string } } }).response?.data?.message ||
+      'Error al cambiar la contraseña'
     uiStore.showToast(message, 'error')
   } finally {
     isSaving.value = false

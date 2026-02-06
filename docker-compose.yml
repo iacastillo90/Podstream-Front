@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  podstream-front:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: podstream-front
+    restart: always
+    ports:
+      - '80:80'
+    networks:
+      - podstream-network
+
+networks:
+  podstream-network:
+    external: true

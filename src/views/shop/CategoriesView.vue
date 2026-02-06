@@ -166,24 +166,25 @@ const router = useRouter()
 const searchQuery = ref('')
 const categories = ref<ViewCategory[]>([])
 // Sidebar Data
-const sidebarCategories = ref<any[]>([])
-const sidebarBrands = ref<any[]>([])
+const sidebarCategories = ref<unknown[]>([])
+const sidebarBrands = ref<unknown[]>([])
 const maxPriceLimit = ref(5000)
 const isMobileSidebarOpen = ref(false)
 
 const fetchCategories = async () => {
   try {
     const response = await CategoryService.getAll()
-    // @ts-ignore
-    const categoriesData = Array.isArray(response) ? response : response.data || response
+    const categoriesData = (
+      Array.isArray(response) ? response : (response as { data: unknown[] }).data || response
+    ) as unknown[]
 
     // Map for Main Grid
     categories.value = categoriesData.map(
-      (cat: any): ViewCategory => ({
+      (cat: Record<string, unknown>): ViewCategory => ({
         ...cat,
-        image: cat.image || 'https://placehold.co/600x800',
-        info: cat.info || 'Explora esta categoría',
-        slug: cat.id,
+        image: (cat.image as string) || 'https://placehold.co/600x800',
+        info: (cat.info as string) || 'Explora esta categoría',
+        slug: cat.id as string | number,
       }),
     )
   } catch (error) {
@@ -194,7 +195,11 @@ const fetchCategories = async () => {
 const fetchMetadata = async () => {
   try {
     // Fetch real metadata for the sidebar to make it useful
-    const meta = await ProductService.getSearchMetadata({})
+    const meta = (await ProductService.getSearchMetadata({})) as {
+      categories?: unknown[]
+      brands?: unknown[]
+      maxPrice?: number
+    }
     if (meta) {
       if (meta.categories) sidebarCategories.value = meta.categories
       if (meta.brands) sidebarBrands.value = meta.brands
@@ -225,20 +230,20 @@ const viewCategoryProducts = (category: any) => {
 }
 
 // Redirect when interacting with Sidebar
-const handleSidebarRedirect = (filters: any) => {
+const handleSidebarRedirect = (filters: Record<string, unknown>) => {
   // Construct query params
-  const query: any = {}
+  const query: Record<string, unknown> = {}
   let shouldRedirect = false
 
-  if (filters.categories && filters.categories.length > 0) {
-    query.categoryId = filters.categories[0]
+  if (filters.categories && (filters.categories as unknown[]).length > 0) {
+    query.categoryId = (filters.categories as unknown[])[0]
     shouldRedirect = true
   }
 
-  if (filters.brands && filters.brands.length > 0) {
+  if (filters.brands && (filters.brands as unknown[]).length > 0) {
     // ProductsView might not handle this yet, but we pass it for future support
     // We can assume ProductsView might evolve to read 'brand' from query
-    query.brand = filters.brands[0]
+    query.brand = (filters.brands as unknown[])[0]
     shouldRedirect = true
   }
 
@@ -249,7 +254,7 @@ const handleSidebarRedirect = (filters: any) => {
   // Only redirect if user explicitly selected a filter
   // This prevents the initial "emit" from the sidebar (which sends defaults) from triggering a redirect
   if (shouldRedirect) {
-    router.push({ name: 'products', query })
+    router.push({ name: 'products', query: query as Record<string, string | number> })
   }
 }
 </script>

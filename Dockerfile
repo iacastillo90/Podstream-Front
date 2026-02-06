@@ -1,7 +1,23 @@
+# Stage 1: Build
+FROM node:20-alpine as builder
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci
+
+COPY . .
+RUN npm run build-only
+
+# Stage 2: Serve
 FROM nginx:alpine
-# Copiamos el dist que subiste por SCP
-COPY ./dist /usr/share/nginx/html
-# Copiamos la configuración que acabamos de crear
+
+# Copy built assets from builder stage
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Copy nginx config
 COPY default.conf /etc/nginx/conf.d/default.conf
+
 EXPOSE 80
+
 CMD ["nginx", "-g", "daemon off;"]

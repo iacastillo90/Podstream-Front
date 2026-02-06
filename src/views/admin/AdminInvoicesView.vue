@@ -293,7 +293,7 @@ const invoices = ref<Invoice[]>([])
 const fetchInvoices = async () => {
   try {
     const response = await InvoiceService.getAll()
-    invoices.value = response as any
+    invoices.value = response as Invoice[]
   } catch (error) {
     console.error('Error fetching invoices', error)
   }
@@ -368,7 +368,11 @@ const exportToExcel = () => {
 }
 
 const exportToPDF = () => {
-  const doc = new jsPDF() as any
+  const doc = new jsPDF() as unknown as {
+    text: (text: string, x: number, y: number) => void
+    autoTable: (options: unknown) => void
+    save: (filename: string) => void
+  }
   doc.text('Boletas de PodStream', 14, 10)
   doc.autoTable({
     head: [['ID Boleta', 'Cliente', 'Fecha', 'Monto Total', 'Estado']],
@@ -398,14 +402,15 @@ const importFromExcel = (event: Event) => {
     const workbook = XLSX.read(data, { type: 'array' })
     const sheetName = workbook.SheetNames[0]
     const worksheet = workbook.Sheets[sheetName]
-    const jsonData = XLSX.utils.sheet_to_json(worksheet) as any[]
+    const jsonData = XLSX.utils.sheet_to_json(worksheet) as Record<string, unknown>[]
 
     jsonData.forEach((row) => {
       const invoice = invoices.value.find((inv) => inv.id === row['ID Boleta'])
       if (invoice) {
-        invoice.clientName = row.Cliente || invoice.clientName
-        invoice.date = row.Fecha || invoice.date
-        invoice.total = parseFloat(row['Monto Total']?.replace('$', '')) || invoice.total
+        invoice.clientName = (row.Cliente as string) || invoice.clientName
+        invoice.date = (row.Fecha as string) || invoice.date
+        invoice.total =
+          parseFloat((row['Monto Total'] as string)?.replace('$', '')) || invoice.total
         invoice.status = row.Estado === 'Pagada' ? 'PAID' : 'PENDING'
       }
     })

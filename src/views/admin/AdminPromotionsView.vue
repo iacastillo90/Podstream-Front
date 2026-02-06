@@ -394,16 +394,16 @@ const fetchPromotions = async () => {
     const rawData = Array.isArray(response) ? response : []
 
     // Map backend fields to frontend structure
-    promotions.value = rawData.map((promo: any) => ({
-      id: promo.id,
-      name: promo.name,
-      description: promo.description || '',
-      code: promo.code || '',
-      discount: promo.discountPercentage || promo.discount || 0,
-      startDate: promo.createdAt ? formatDateForInput(promo.createdAt) : '',
-      endDate: promo.validUntil ? formatDateForInput(promo.validUntil) : '',
-      active: promo.active !== undefined ? promo.active : promo.status === 'active',
-      status: promo.active ? 'active' : 'inactive',
+    promotions.value = rawData.map((promo: Record<string, unknown>) => ({
+      id: promo.id as number,
+      name: (promo.name as string) || '',
+      description: (promo.description as string) || '',
+      code: (promo.code as string) || '',
+      discount: (promo.discountPercentage as number) || (promo.discount as number) || 0,
+      startDate: promo.createdAt ? formatDateForInput(promo.createdAt as string) : '',
+      endDate: promo.validUntil ? formatDateForInput(promo.validUntil as string) : '',
+      active: promo.active !== undefined ? (promo.active as boolean) : promo.status === 'active',
+      status: (promo.active as boolean) ? 'active' : 'inactive',
     }))
   } catch (error) {
     console.error('Error fetching promotions', error)
@@ -494,9 +494,12 @@ const savePromotion = async () => {
     }
 
     if (isEditing.value && currentPromotion.value.id) {
-      await PromotionService.update(currentPromotion.value.id, backendData as any)
+      await PromotionService.update(
+        currentPromotion.value.id,
+        backendData as unknown as Partial<Promotion>,
+      )
     } else {
-      await PromotionService.create(backendData as any)
+      await PromotionService.create(backendData as unknown as Omit<Promotion, 'id'>)
     }
     await fetchPromotions()
     closeModal()
@@ -549,7 +552,11 @@ const exportToExcel = () => {
 }
 
 const exportToPDF = () => {
-  const doc = new jsPDF() as any
+  const doc = new jsPDF() as unknown as {
+    text: (text: string, x: number, y: number) => void
+    autoTable: (options: unknown) => void
+    save: (filename: string) => void
+  }
   doc.text('Promociones de PodStream', 14, 10)
   doc.autoTable({
     head: [['ID', 'Nombre', 'Descripción', 'Descuento', 'Inicio', 'Fin', 'Estado']],
@@ -581,16 +588,17 @@ const importFromExcel = (event: Event) => {
     const workbook = XLSX.read(data, { type: 'array' })
     const sheetName = workbook.SheetNames[0]
     const worksheet = workbook.Sheets[sheetName]
-    const jsonData = XLSX.utils.sheet_to_json(worksheet) as any[]
+    const jsonData = XLSX.utils.sheet_to_json(worksheet) as Record<string, unknown>[]
 
     jsonData.forEach((row) => {
       const promotion = promotions.value.find((p) => p.id === row.ID)
       if (promotion) {
-        promotion.name = row.Nombre || promotion.name
-        promotion.description = row.Descripción || promotion.description
-        promotion.discount = parseInt(row.Descuento?.replace('%', '')) || promotion.discount
-        promotion.startDate = row['Fecha Inicio'] || promotion.startDate
-        promotion.endDate = row['Fecha Fin'] || promotion.endDate
+        promotion.name = (row.Nombre as string) || promotion.name
+        promotion.description = (row.Descripción as string) || promotion.description
+        promotion.discount =
+          parseInt((row.Descuento as string)?.replace('%', '')) || promotion.discount
+        promotion.startDate = (row['Fecha Inicio'] as string) || promotion.startDate
+        promotion.endDate = (row['Fecha Fin'] as string) || promotion.endDate
         promotion.status = row.Estado === 'Activa' ? 'active' : 'inactive'
       }
     })
