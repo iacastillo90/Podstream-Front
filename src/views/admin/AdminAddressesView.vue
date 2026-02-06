@@ -162,7 +162,9 @@ const fetchAddresses = async () => {
   try {
     const response = await AddressService.getAllAdmin()
     // Handle unwrapped response
-    const rawData = Array.isArray(response) ? response : (response as { data: any[] }).data || []
+    const rawData = Array.isArray(response)
+      ? response
+      : (response as { data: unknown[] }).data || []
 
     addresses.value = rawData.map((addr: unknown) => {
       const a = addr as AdminAddress & { clientId?: number }

@@ -246,7 +246,7 @@ const fetchRecommendations = async () => {
       // Fallback to generic products
       const res = await ProductService.getAll()
       // getAll returns PaginationResponse
-      const products = (res as any).content || []
+      const products = res.content || []
       recommendedProducts.value = products.slice(0, 4)
     }
   } catch (error) {
@@ -254,7 +254,7 @@ const fetchRecommendations = async () => {
     // Fallback if recommendation service fails
     try {
       const res = await ProductService.getAll()
-      const products = (res as any).content || []
+      const products = res.content || []
       recommendedProducts.value = products.slice(0, 4)
     } catch (e) {
       console.error(e)

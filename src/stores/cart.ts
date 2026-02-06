@@ -30,14 +30,13 @@ export const useCartStore = defineStore('cart', {
         existingItem.subTotal = existingItem.quantity * existingItem.price
       } else {
         // Resolve image URL safely
-        const p = product as any
         let imageUrl = ''
 
         // Use helper directly or logic here. Since we have helper imported:
         imageUrl = getFullImageUrl(
-          p.image ||
-            (p.images && p.images.length > 0 ? p.images[0] : null) ||
-            (p.photos && p.photos.length > 0 ? p.photos[0] : null),
+          product.image ||
+            (product.images && product.images.length > 0 ? product.images[0] : null) ||
+            (product.photos && product.photos.length > 0 ? product.photos[0] : null),
         )
 
         this.items.push({

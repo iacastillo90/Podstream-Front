@@ -14,7 +14,7 @@ export interface Product {
   images?: string[]
   rating?: number
   reviews?: number
-  reviewsList?: any[] // Avoid circular dep for now, or use ProductReview if imported
+  reviewsList?: import('./index').ProductReview[] // Avoid circular dep for now, or use ProductReview if imported
   specifications?: { key: string; value: string }[]
   model3d_url?: string
   category?: Category // Optional populated field

@@ -212,18 +212,18 @@ const fetchCategories = async () => {
   try {
     const response = await CategoryService.getAll()
     // Backend returns the array directly properly intercepted
-    const rawData = response as any
+    const rawData = response as unknown as Record<string, unknown>[]
 
     // Map backend fields including dates
-    categories.value = rawData.map((cat: any) => ({
-      id: cat.id,
-      name: cat.name,
-      description: cat.description || '',
-      info: cat.info || '',
-      image: cat.image || '',
-      slug: cat.slug || '',
-      createdDate: cat.createdDate || cat.created_date,
-      lastModifiedDate: cat.lastModifiedDate || cat.last_modified_date,
+    categories.value = rawData.map((cat: Record<string, unknown>) => ({
+      id: cat.id as number,
+      name: (cat.name as string) || '',
+      description: (cat.description as string) || '',
+      info: (cat.info as string) || '',
+      image: (cat.image as string) || '',
+      slug: (cat.slug as string) || '',
+      createdDate: (cat.createdDate as string) || (cat.created_date as string),
+      lastModifiedDate: (cat.lastModifiedDate as string) || (cat.last_modified_date as string),
     }))
   } catch (error) {
     console.error('Error fetching categories:', error)

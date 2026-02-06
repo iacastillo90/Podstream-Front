@@ -5,7 +5,7 @@ import type { VersusProduct } from '@/types'
 
 export const useVersusStore = defineStore('versus', () => {
   const selectedProducts = ref<VersusProduct[]>([])
-  const searchResults = ref<any[]>([])
+  const searchResults = ref<unknown[]>([])
   const isSearching = ref(false)
 
   // Available products for the dropdown (mapped from searchResults)
@@ -19,7 +19,7 @@ export const useVersusStore = defineStore('versus', () => {
     isSearching.value = true
     try {
       const data = await ProductService.search(query)
-      searchResults.value = data
+      searchResults.value = data as unknown[]
     } catch (error) {
       console.error('Search error:', error)
     } finally {
@@ -35,7 +35,25 @@ export const useVersusStore = defineStore('versus', () => {
     }
 
     try {
-      const data = await ProductService.getSpecsNormalized(productId)
+      const result = await ProductService.getSpecsNormalized(productId)
+      const data = result as {
+        id: number | string
+        name: string
+        image: string
+        price: number
+        radar?: {
+          buildQuality?: number
+          features?: number
+          value?: number
+          durability?: number
+          easeOfUse?: number
+        }
+        specs?: {
+          type?: string
+          frequencyResponse?: string
+          connection?: string
+        }
+      }
 
       // Adapter: Map API response to View structure
       const newProduct: VersusProduct = {

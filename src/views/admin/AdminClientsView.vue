@@ -288,7 +288,7 @@
               >
                 <span class="text-gray-400 text-sm">{{ purchase.date }}</span>
                 <span class="text-white font-mono font-medium"
-                  >${{ (purchase as any).amount?.toFixed(2) || '0.00' }}</span
+                  >${{ ((purchase as Record<string, unknown>).amount as number)?.toFixed(2) || '0.00' }}</span
                 >
               </div>
             </div>
@@ -330,14 +330,16 @@ const fetchClients = async () => {
   try {
     const response = await ClientService.getAll()
     // Backend wraps response in { success, message, data } OR returns array directly
-    const rawData = response as any
+    const rawData = response as unknown as Record<string, unknown>[]
 
     // Map UserDTO to Client type expected by the view
-    clients.value = rawData.map((user: any) => ({
-      id: user.id,
-      name: `${user.firstname || ''} ${user.lastname || ''}`.trim() || user.username,
-      email: user.email || user.username,
-      address: user.country || '-',
+    clients.value = rawData.map((user: Record<string, unknown>) => ({
+      id: user.id as number,
+      name:
+        `${(user.firstname as string) || ''} ${(user.lastname as string) || ''}`.trim() ||
+        (user.username as string),
+      email: (user.email as string) || (user.username as string),
+      address: (user.country as string) || '-',
       purchases: 0, // Backend doesn't provide this yet
       purchaseHistory: [], // Backend doesn't provide this yet
       status: user.enabled ? 'active' : 'inactive',
@@ -427,7 +429,11 @@ const exportToExcel = () => {
 }
 
 const exportToPDF = () => {
-  const doc = new jsPDF() as any
+  const doc = new jsPDF() as unknown as {
+    text: (text: string, x: number, y: number) => void
+    autoTable: (options: unknown) => void
+    save: (filename: string) => void
+  }
   doc.text('Clientes de PodStream', 14, 10)
   doc.autoTable({
     head: [['ID', 'Nombre', 'Email', 'Dirección', 'Compras', 'Estado']],
@@ -458,15 +464,15 @@ const importFromExcel = (event: Event) => {
     const workbook = XLSX.read(data, { type: 'array' })
     const sheetName = workbook.SheetNames[0]
     const worksheet = workbook.Sheets[sheetName]
-    const jsonData = XLSX.utils.sheet_to_json(worksheet) as any[]
+    const jsonData = XLSX.utils.sheet_to_json(worksheet) as Record<string, unknown>[]
 
     jsonData.forEach((row) => {
       const client = clients.value.find((c) => c.id === row.ID)
       if (client) {
-        client.name = row.Nombre || client.name
-        client.email = row.Email || client.email
-        client.address = row.Dirección || client.address
-        client.purchases = row.Compras || client.purchases
+        client.name = (row.Nombre as string) || client.name
+        client.email = (row.Email as string) || client.email
+        client.address = (row.Dirección as string) || client.address
+        client.purchases = (row.Compras as number) || client.purchases
         client.status = row.Estado === 'Activo' ? 'active' : 'inactive'
       }
     })
