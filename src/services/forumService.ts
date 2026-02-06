@@ -37,10 +37,19 @@ export const ForumService = {
     const response = await api.get(`/forum/categories/${categoryId}/topics`, {
       params: { page, size },
     })
-    // If interceptor unwraps it, response is the object. If not, check .data
-    // Cast to unknown first to avoid ESLint 'unexpected any' if possible, or use a specific type assertion
-    const payload = response as unknown as { data?: any }
-    return payload.data || payload
+    const payload = response as unknown as {
+      content?: Record<string, unknown>[]
+      data?: Record<string, unknown>[]
+    }
+    // Handle both direct page/size response or wrapped .data
+    // Just return what we have, the component usually handles the shape.
+    // However the return type says { content: ForumTopic[]... }
+    // Ideally we should map it. For now let's just cast it to expected output if structurally similar.
+    return (payload.data || payload) as unknown as {
+      content: ForumTopic[]
+      totalElements: number
+      totalPages: number
+    }
   },
 
   async getTopic(id: number | string): Promise<ForumTopic> {
@@ -49,7 +58,32 @@ export const ForumService = {
 
     // Map author info if it's a nested object
     if (response && typeof response === 'object') {
-      const topic = response as any
+      const msg = response as unknown as Record<string, unknown>
+      // Cast to partial shape to check standard properties
+      const topic = msg as {
+        id?: number
+        title?: string
+        content?: string
+        author?: {
+          firstname?: string
+          lastname?: string
+          username?: string
+          email?: string
+          id?: number
+        }
+        authorId?: number
+        authorName?: string
+        category?: { name: string; id: number; slug: string }
+        categoryId?: number
+        categoryName?: string
+        categorySlug?: string
+        pinned?: boolean
+        locked?: boolean
+        repliesCount?: number
+        views?: number
+        createdAt?: string
+        updatedAt?: string
+      }
 
       // Construct logical author name
       let authorName = 'Usuario desconocido'
@@ -66,17 +100,24 @@ export const ForumService = {
       }
 
       return {
-        ...topic,
-        authorName,
+        id: topic.id || 0,
+        title: topic.title || '',
+        content: topic.content || '',
+        categoryId: topic.categoryId || topic.category?.id || 0,
         categoryName: topic.category?.name || topic.categoryName || 'Sin categoría',
+        categorySlug: topic.category?.slug || topic.categorySlug || '',
+        authorId: topic.authorId || topic.author?.id || 0,
+        authorName,
+        createdAt: topic.createdAt || new Date().toISOString(),
+        updatedAt: topic.updatedAt || new Date().toISOString(),
         isPinned: topic.pinned || false,
         isLocked: topic.locked || false,
         repliesCount: topic.repliesCount || 0,
         views: topic.views || 0,
-      }
+      } as ForumTopic
     }
 
-    return response
+    return response as unknown as ForumTopic
   },
 
   async createTopic(data: {
@@ -101,7 +142,15 @@ export const ForumService = {
     })
 
     // Helper function to map author name (reused logic)
-    const mapAuthorName = (item: any) => {
+    const mapAuthorName = (item: {
+      author?: {
+        firstname?: string
+        lastname?: string
+        username?: string
+        email?: string
+      }
+      authorName?: string
+    }) => {
       if (item.author) {
         if (item.author.firstname && item.author.lastname) {
           return `${item.author.firstname} ${item.author.lastname}`
@@ -112,16 +161,40 @@ export const ForumService = {
     }
 
     // Handle pagination wrapper
-    const payload = (response as any).data || response
-    const content = payload.content || (Array.isArray(payload) ? payload : [])
+    const payload =
+      (
+        response as unknown as {
+          data?: { content?: unknown[]; totalElements?: number; totalPages?: number }
+          content?: unknown[] // support direct content array or page object
+          totalElements?: number
+          totalPages?: number
+        }
+      ).data ||
+      (response as unknown as {
+        content?: unknown[]
+        totalElements?: number
+        totalPages?: number
+      })
 
-    const mappedContent = content.map((post: any) => ({
-      ...post,
-      authorName: mapAuthorName(post),
+    const content = payload.content || (Array.isArray(payload) ? (payload as unknown[]) : [])
+
+    const mappedContent = content.map((post: unknown) => ({
+      ...(post as object),
+      authorName: mapAuthorName(
+        post as {
+          author?: {
+            firstname?: string
+            lastname?: string
+            username?: string
+            email?: string
+          }
+          authorName?: string
+        },
+      ),
     }))
 
     return {
-      content: mappedContent,
+      content: mappedContent as unknown as ForumPost[],
       totalElements: payload.totalElements || mappedContent.length,
       totalPages: payload.totalPages || 1,
     }
@@ -154,31 +227,42 @@ export const ForumService = {
       const response = await api.get('/admin/forum/moderation/pending-topics')
       console.log('Pending content response:', response)
 
-      const payload = (response as any).data || response
+      const payload =
+        (
+          response as {
+            data?: { topics?: Record<string, unknown>[]; totalPending?: number }
+          }
+        ).data || (response as { topics?: Record<string, unknown>[]; totalPending?: number })
 
       // Handle wrapped response { topics: [...], totalPending: 5 }
       const topicsList = Array.isArray(payload.topics)
         ? payload.topics
         : Array.isArray(payload)
-          ? payload
+          ? (payload as Record<string, unknown>[])
           : []
 
       // Map topics to standardize author (if not already handled by backend) and content fallback
-      const mappedTopics = topicsList.map((item: any) => ({
-        ...item,
-        authorName:
-          item.authorName ||
-          (item.author
-            ? item.author.username || item.author.firstname || item.author.email
-            : 'Usuario desconocido'),
-        // Backend now returns content, but we keep fallback just in case
-        content: item.content || item.title || '',
-        contentSnippet:
-          item.contentSnippet || (item.content ? item.content.substring(0, 200) : item.title),
-      }))
+      const mappedTopics = topicsList.map((item: Record<string, unknown>) => {
+        const author = item.author as
+          | { username?: string; firstname?: string; email?: string }
+          | undefined
+        return {
+          ...item,
+          authorName:
+            (item.authorName as string) ||
+            (author ? author.username || author.firstname || author.email : 'Usuario desconocido'),
+          // Backend now returns content, but we keep fallback just in case
+          content: (item.content as string) || (item.title as string) || '',
+          contentSnippet:
+            (item.contentSnippet as string) ||
+            ((item.content as string)
+              ? (item.content as string).substring(0, 200)
+              : (item.title as string)),
+        }
+      })
 
       return {
-        topics: mappedTopics,
+        topics: mappedTopics as unknown as ForumTopic[],
         posts: [], // Endpoint is pending-topics only for now
         totalPending: payload.totalPending || mappedTopics.length,
       }
@@ -197,7 +281,7 @@ export const ForumService = {
   },
 
   // --- Admin: Reports ---
-  async getReports(): Promise<any[]> {
+  async getReports(): Promise<unknown[]> {
     // Replace any with ForumReport[] when imported
     return await api.get('/admin/forum/reports')
   },
@@ -222,7 +306,9 @@ export const ForumService = {
 
   async getNotifications(): Promise<import('@/types/forum').ForumNotification[]> {
     const response = await api.get('/forum/notifications')
-    const payload = response as unknown as { content?: import('@/types/forum').ForumNotification[] }
+    const payload = response as unknown as {
+      content?: import('@/types/forum').ForumNotification[]
+    }
     return payload.content || (Array.isArray(response) ? response : [])
   },
 
