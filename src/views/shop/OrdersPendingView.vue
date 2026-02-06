@@ -109,7 +109,9 @@ const fetchOrders = async () => {
   try {
     const response = await OrderService.getMyOrders()
     // The interceptor unwraps the response, so 'response' IS the array of orders
-    const orders = Array.isArray(response) ? response : (response as any).data || []
+    const orders = Array.isArray(response)
+      ? response
+      : (response as { data?: unknown[] }).data || []
 
     // Filter for active/pending statuses
     // PENDING_PAYMENT, PAYMENT_CONFIRMED, SHIPPED, DELIVERED

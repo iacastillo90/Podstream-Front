@@ -148,9 +148,9 @@
       <!-- Simple Grid instead of Swiper for cleaner code in this refactor, relies on ProductsView card style -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <ProductCard
-          v-for="product in products"
-          :key="(product as { name?: string }).name"
-          :product="product as any"
+          v-for="(product, idx) in products"
+          :key="idx"
+          :product="product"
           @add-to-cart="addToRecommendation"
           @view-details="viewRecommendation"
         />

@@ -138,7 +138,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ProductService } from '@/services/productService'
 import type { Product, Category } from '@/types'
@@ -192,22 +192,38 @@ const fetchProducts = async () => {
     // Call API with filters
     const response = await ProductService.getAll(0, 50, activeFilters) // Page 0, Size 50 (for now)
 
-    const rawData = (response as any).content || (response as any).data || response
+    const rawData =
+      (response as { content?: unknown[] }).content ||
+      (response as { data?: unknown[] }).data ||
+      response
 
     // Map response
-    products.value = (Array.isArray(rawData) ? rawData : []).map((p: any) => ({
-      ...p,
-      price: Number(p.price),
-      categoryId: Number(p.categoryId),
-      image: getFullImageUrl(
-        p.image ||
-          (p.images && p.images.length > 0 ? p.images[0] : null) ||
-          (p.photos && p.photos.length > 0 ? p.photos[0] : null) ||
-          (p.imageCollection && p.imageCollection.length > 0 ? p.imageCollection[0] : null),
-      ),
-      // Brand is now real if backend sends it, otherwise fallback
-      brand: (p as any).brand,
-    }))
+    products.value = (Array.isArray(rawData) ? rawData : []).map((p: unknown) => {
+      const prod = p as {
+        price?: number
+        categoryId?: number
+        image?: string
+        images?: string[]
+        photos?: string[]
+        imageCollection?: string[]
+        brand?: string
+      }
+      return {
+        ...(p as Record<string, unknown>),
+        price: Number(prod.price),
+        categoryId: Number(prod.categoryId),
+        image: getFullImageUrl(
+          prod.image ||
+            (prod.images && prod.images.length > 0 ? prod.images[0] : null) ||
+            (prod.photos && prod.photos.length > 0 ? prod.photos[0] : null) ||
+            (prod.imageCollection && prod.imageCollection.length > 0
+              ? prod.imageCollection[0]
+              : null),
+        ),
+        // Brand is now real if backend sends it, otherwise fallback
+        brand: prod.brand,
+      }
+    })
 
     // Fetch Metadata for Sidebar based on CURRENT filters (to update counts)
     // Note: Usually metadata is fetched with the same query.
@@ -219,14 +235,15 @@ const fetchProducts = async () => {
   }
 }
 
-const fetchMetadata = async (activeFilters: any) => {
+const fetchMetadata = async (activeFilters: Record<string, unknown>) => {
   try {
     const meta = await ProductService.getSearchMetadata(activeFilters)
     // Update Sidebar props if meta is valid
     if (meta) {
-      if (meta.categories) categories.value = meta.categories
-      if (meta.maxPrice) maxPriceLimit.value = meta.maxPrice
-      if (meta.brands) brands.value = meta.brands
+      const metadata = meta as { categories?: unknown[]; maxPrice?: number; brands?: unknown[] }
+      if (metadata.categories) categories.value = metadata.categories
+      if (metadata.maxPrice) maxPriceLimit.value = metadata.maxPrice
+      if (metadata.brands) brands.value = metadata.brands
     }
   } catch (e) {
     console.error('Error fetching metadata', e)
@@ -245,14 +262,21 @@ const fetchInitialData = async () => {
 }
 
 // Handler
-const handleFilterUpdate = (newFilters: any) => {
+const handleFilterUpdate = (newFilters: Record<string, unknown>) => {
   // Map sidebar event structure to our state
   // Sidebar emits: { categories: [], brands: [], minPrice, maxPrice, inStock }
-  filters.value.category = newFilters.categories || []
-  filters.value.brand = newFilters.brands || []
-  filters.value.minPrice = newFilters.minPrice
-  filters.value.maxPrice = newFilters.maxPrice
-  filters.value.inStock = newFilters.inStock
+  const filters = newFilters as {
+    categories?: number[]
+    brands?: string[]
+    minPrice?: number
+    maxPrice?: number
+    inStock?: boolean
+  }
+  filters.value.category = filters.categories || []
+  filters.value.brand = filters.brands || []
+  filters.value.minPrice = filters.minPrice
+  filters.value.maxPrice = filters.maxPrice
+  filters.value.inStock = filters.inStock
 
   fetchProducts()
 }

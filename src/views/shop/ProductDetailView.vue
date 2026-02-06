@@ -287,7 +287,7 @@ const fetchProduct = async () => {
       const reviewRes = await ReviewService.getAll(id as string)
       product.value.reviewsList = Array.isArray(reviewRes)
         ? reviewRes
-        : (reviewRes as any).data || []
+        : (reviewRes as { data?: unknown[] }).data || []
     } catch (e) {
       console.warn('Could not load reviews', e)
       product.value.reviewsList = []
@@ -303,16 +303,21 @@ const fetchRelated = async () => {
   const id = route.params.id
   try {
     const response = await RecommendationService.getContentBased(id as string)
-    const rawData = Array.isArray(response) ? response : (response as any).data || []
+    const rawData = Array.isArray(response)
+      ? response
+      : (response as { data?: unknown[] }).data || []
 
-    relatedProducts.value = rawData.map((p: any) => ({
-      ...p,
-      image: getImageUrl(
-        p.image ||
-          (p.images && p.images.length > 0 ? p.images[0] : null) ||
-          (p.photos && p.photos.length > 0 ? p.photos[0] : null),
-      ),
-    }))
+    relatedProducts.value = rawData.map((p: unknown) => {
+      const prod = p as { image?: string; images?: string[]; photos?: string[] }
+      return {
+        ...(p as Record<string, unknown>),
+        image: getImageUrl(
+          prod.image ||
+            (prod.images && prod.images.length > 0 ? prod.images[0] : null) ||
+            (prod.photos && prod.photos.length > 0 ? prod.photos[0] : null),
+        ),
+      }
+    })
   } catch (error) {
     console.warn('Error fetching recommendations:', error)
   }
@@ -325,7 +330,10 @@ const images = computed(() => {
 
   // Check for various possible backend field names for the gallery
   const gallery =
-    product.value.images || product.value.photos || (product.value as any).imageCollection || []
+    product.value.images ||
+    product.value.photos ||
+    (product.value as Record<string, unknown>).imageCollection ||
+    []
 
   // Ensure we have an array
   let validGallery = Array.isArray(gallery) ? gallery : []
@@ -358,7 +366,7 @@ onMounted(() => {
   fetchRelated()
 })
 
-const addToCart = async (prod: any) => {
+const addToCart = async (prod: unknown) => {
   const productToAdd = prod as Product
   try {
     await cartStore.addItem(productToAdd, quantity.value)

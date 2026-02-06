@@ -225,8 +225,9 @@ const filteredCategories = computed(() => {
   )
 })
 
-const viewCategoryProducts = (category: any) => {
-  router.push({ name: 'products', query: { categoryId: category.id } })
+const viewCategoryProducts = (category: unknown) => {
+  const cat = category as { id: number }
+  router.push({ name: 'products', query: { categoryId: cat.id } })
 }
 
 // Redirect when interacting with Sidebar
