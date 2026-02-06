@@ -281,9 +281,11 @@ export const ForumService = {
   },
 
   // --- Admin: Reports ---
-  async getReports(): Promise<unknown[]> {
-    // Replace any with ForumReport[] when imported
-    return await api.get('/admin/forum/reports')
+  async getReports(): Promise<import('@/types/forum').ForumReport[]> {
+    // Explicitly cast to unknown then ForumReport[] to avoid checks if api returns strict types
+    return (await api.get(
+      '/admin/forum/reports',
+    )) as unknown as import('@/types/forum').ForumReport[]
   },
 
   async resolveReport(id: number, action: 'RESOLVE' | 'DISMISS'): Promise<void> {

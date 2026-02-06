@@ -13,7 +13,7 @@ export const ProductService = {
   async getAll(
     page = 0,
     size = 10,
-    filters: any = {}, // Replace fixed categoryId with generic filters object
+    filters: Record<string, unknown> = {}, // Replace fixed categoryId with generic filters object
   ): Promise<PaginationResponse<Product>> {
     const params = new URLSearchParams()
     params.append('page', page.toString())
@@ -78,7 +78,7 @@ export const ProductService = {
   /**
    * Obtiene especificaciones normalizadas para versus/comparación
    */
-  async getSpecsNormalized(id: number | string): Promise<any> {
+  async getSpecsNormalized(id: number | string): Promise<unknown> {
     return await api.get(`/products/${id}`)
   },
 
@@ -100,7 +100,7 @@ export const ProductService = {
    * Obtiene metadatos reales del backend para filtros dinámicos
    * Endpoint: GET /api/products/metadata
    */
-  async getSearchMetadata(currentFilters: any = {}): Promise<any> {
+  async getSearchMetadata(currentFilters: Record<string, unknown> = {}): Promise<unknown> {
     const params = new URLSearchParams()
     // Pass current filters to metadata endpoint to get context-aware counts
     Object.keys(currentFilters).forEach((key) => {
@@ -109,7 +109,7 @@ export const ProductService = {
         if (Array.isArray(value)) {
           if (value.length > 0) params.append(key, value.join(','))
         } else {
-          params.append(key, value.toString())
+          params.append(key, String(value))
         }
       }
     })

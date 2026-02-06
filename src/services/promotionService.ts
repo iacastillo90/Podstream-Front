@@ -4,7 +4,7 @@ import type { Promotion } from '@/types'
 
 export const PromotionService = {
   create: (data: Omit<Promotion, 'id'>) => {
-    return api.post('/promotions', data) as unknown as Promise<any>
+    return api.post('/promotions', data) as unknown as Promise<unknown>
   },
   getAll: () => {
     return api.get<Promotion[]>('/promotions')
@@ -13,6 +13,6 @@ export const PromotionService = {
     return api.delete(`/promotions/${id}`)
   },
   update: (id: number | string, data: Partial<Promotion>) => {
-    return api.put(`/promotions/${id}`, data) as unknown as Promise<any>
+    return api.put(`/promotions/${id}`, data) as unknown as Promise<unknown>
   },
 }

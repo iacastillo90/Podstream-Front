@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { AuthService } from '@/services/authService'
 import type { User } from '@/types/auth'
+import type { RegisterRequest } from '@/types'
 
 export const useAuthStore = defineStore(
   'auth',
@@ -23,25 +24,26 @@ export const useAuthStore = defineStore(
       // AuthResponse might be flat OR nested with 'user' object
       token.value = data.token
 
-      const userData = (data as any).user || data
+      const payload = data as unknown as { user?: User }
+      const userData = payload.user || (data as unknown as User)
 
       if (userData) {
         // Normalize role: Backend sends 'USER', frontend uses 'CLIENT'
-        const roleRaw = userData.role
+        const roleRaw = String(userData.role)
         // Normalize both 'USER' and potential lowercase 'user' or 'client' just in case
         const role = roleRaw === 'USER' || roleRaw === 'user' ? 'CLIENT' : roleRaw
 
         // Construct name if separated
         const name =
           userData.name ||
-          (userData.firstname ? `${userData.firstname} ${userData.lastname}` : userData.email)
+          (userData.firstName ? `${userData.firstName} ${userData.lastName}` : userData.email)
 
         if (userData.id || userData.email) {
           user.value = {
             id: userData.id,
             name: name,
             email: userData.email,
-            role: role,
+            role: role as import('@/types/auth').UserRole,
           }
         }
       }
@@ -68,7 +70,7 @@ export const useAuthStore = defineStore(
       return data
     }
 
-    const register = async (registerData: any) => {
+    const register = async (registerData: RegisterRequest) => {
       const data = await AuthService.register(registerData)
 
       token.value = data.token

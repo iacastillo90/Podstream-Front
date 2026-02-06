@@ -6,7 +6,7 @@ export const StudioService = {
     return await api.get('/studio/catalog')
   },
 
-  async saveBuild(payload: { name: string; items: any[] }): Promise<void> {
+  async saveBuild(payload: { name: string; items: unknown[] }): Promise<void> {
     return await api.post('/studio/builds', payload)
   },
 
