@@ -302,7 +302,8 @@ onMounted(() => {
 })
 
 const addToCanvas = (product: unknown) => {
-  store.addItem(product)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  store.addItem(product as any)
 }
 
 const rotateItem = (id: number | string, angle: number) => {

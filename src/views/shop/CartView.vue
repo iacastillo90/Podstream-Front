@@ -173,12 +173,14 @@ import { getFullImageUrl } from '@/utils/imageHelper'
 import { formatCurrency } from '@/utils/formatters'
 import { useAuthStore } from '@/stores/auth' // Ensure auth is checked
 
+import type { Product } from '@/types'
+
 const router = useRouter()
 const store = useCartStore()
 const authStore = useAuthStore()
 
 // For recommendations
-const products = ref<unknown[]>([])
+const products = ref<Product[]>([])
 const isProcessingPayment = ref(false) // Loading state
 
 onMounted(async () => {
@@ -193,13 +195,13 @@ onMounted(async () => {
     products.value = rawData.slice(0, 3).map((p) => {
       const prod = p as { image?: string; images?: string[]; photos?: string[] }
       return {
-        ...p,
+        ...(p as Product), // Cast to Product to satisfy type
         image: getFullImageUrl(
           prod.image ||
             (prod.images && prod.images.length > 0 ? prod.images[0] : null) ||
             (prod.photos && prod.photos.length > 0 ? prod.photos[0] : null),
         ),
-      }
+      } as Product
     })
   } catch (e) {
     console.error(e)
@@ -227,15 +229,13 @@ const removeItem = (index: number) => {
   store.removeItem(item.productId)
 }
 
-const addToRecommendation = (product: unknown) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  store.addItem(product as any, 1)
+const addToRecommendation = (product: Product) => {
+  store.addItem(product, 1)
 }
 
-const viewRecommendation = (product: unknown) => {
-  const prod = product as { id?: number }
-  if (prod.id) {
-    router.push(`/products/${prod.id}`)
+const viewRecommendation = (product: Product) => {
+  if (product.id) {
+    router.push(`/products/${product.id}`)
   }
 }
 

@@ -166,8 +166,8 @@ const router = useRouter()
 const searchQuery = ref('')
 const categories = ref<ViewCategory[]>([])
 // Sidebar Data
-const sidebarCategories = ref<unknown[]>([])
-const sidebarBrands = ref<unknown[]>([])
+const sidebarCategories = ref<(Category & { count?: number })[]>([])
+const sidebarBrands = ref<{ name: string; count: number }[]>([])
 const maxPriceLimit = ref(5000)
 const isMobileSidebarOpen = ref(false)
 
@@ -179,14 +179,16 @@ const fetchCategories = async () => {
     ) as unknown[]
 
     // Map for Main Grid
-    categories.value = categoriesData.map(
-      (cat: Record<string, unknown>): ViewCategory => ({
-        ...cat,
-        image: (cat.image as string) || 'https://placehold.co/600x800',
-        info: (cat.info as string) || 'Explora esta categoría',
-        slug: cat.id as string | number,
-      }),
-    )
+    categories.value = categoriesData.map((cat: unknown): ViewCategory => {
+      const c = cat as Category
+      const raw = cat as Record<string, unknown>
+      return {
+        ...c,
+        image: (raw.image as string) || 'https://placehold.co/600x800',
+        info: (raw.info as string) || 'Explora esta categoría',
+        slug: c.id,
+      }
+    })
   } catch (error) {
     console.error('Failed to load categories:', error)
   }
@@ -196,17 +198,16 @@ const fetchMetadata = async () => {
   try {
     // Fetch real metadata for the sidebar to make it useful
     const meta = (await ProductService.getSearchMetadata({})) as {
-      categories?: unknown[]
-      brands?: unknown[]
+      categories?: (Category & { count?: number })[]
+      brands?: { name: string; count: number }[]
       maxPrice?: number
     }
-    if (meta) {
-      if (meta.categories) sidebarCategories.value = meta.categories
-      if (meta.brands) sidebarBrands.value = meta.brands
-      if (meta.maxPrice) maxPriceLimit.value = meta.maxPrice
-    }
-  } catch (e) {
-    console.error('Error fetching metadata for sidebar', e)
+
+    if (meta.categories) sidebarCategories.value = meta.categories
+    if (meta.brands) sidebarBrands.value = meta.brands
+    if (meta.maxPrice) maxPriceLimit.value = meta.maxPrice
+  } catch (error) {
+    console.error('Failed to load metadata:', error)
   }
 }
 

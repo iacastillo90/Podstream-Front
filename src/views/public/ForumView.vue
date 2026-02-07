@@ -407,7 +407,7 @@ const createTopic = async () => {
       categoryId: forumCategories.value.find((c) => c.name === newTopic.category)?.id || 1,
     }
     // Cast to expected type if needed or use dedicated service method
-    // @ts-expect-error - topicData may not match exact service signature
+    // Cast to expected type if needed or use dedicated service method
     await ForumService.createTopic(topicData)
     await fetchForumData()
     newTopic.title = ''
@@ -429,7 +429,6 @@ const editTopic = (topic: Topic | WebTopic) => {
 const updateTopic = () => {
   const idx = userCreatedTopics.value.findIndex((t) => t.id === editTopicData.id)
   if (idx !== -1) {
-    // @ts-expect-error - editTopicData may have partial fields
     userCreatedTopics.value[idx] = { ...userCreatedTopics.value[idx], ...editTopicData }
   }
   showEditTopicForm.value = false

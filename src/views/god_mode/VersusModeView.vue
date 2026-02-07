@@ -28,11 +28,11 @@
 
         <!-- Dropdown -->
         <div
-          v-if="store.availableProducts.length > 0"
+          v-if="typedAvailableProducts.length > 0"
           class="absolute right-0 top-full mt-2 w-64 bg-black border border-white/10 rounded-xl shadow-xl overflow-hidden"
         >
           <div
-            v-for="prod in store.availableProducts"
+            v-for="prod in typedAvailableProducts"
             :key="prod.id"
             class="px-4 py-3 hover:bg-white/5 cursor-pointer flex items-center gap-3 border-b border-white/5 last:border-0"
             @click="store.addProduct(prod.id)"
@@ -59,7 +59,7 @@
 
         <div class="flex gap-6 mt-8">
           <div
-            v-for="(prod, index) in store.selectedProducts"
+            v-for="(prod, index) in typedSelectedProducts"
             :key="prod.id"
             class="flex items-center gap-2"
           >
@@ -78,7 +78,7 @@
             :style="{ gridTemplateColumns: `repeat(${store.selectedProducts.length}, 1fr)` }"
           >
             <div
-              v-for="prod in store.selectedProducts"
+              v-for="prod in typedSelectedProducts"
               :key="prod.id"
               class="p-6 text-center border-b border-white/10 relative group"
             >
@@ -175,10 +175,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useVersusStore } from '@/stores/versus'
+import type { Product } from '@/types'
 
 const store = useVersusStore()
+const typedAvailableProducts = computed(() => store.availableProducts as unknown as Product[])
+const typedSelectedProducts = computed(() => store.selectedProducts as unknown as Product[])
+
 const radarCanvas = ref<HTMLCanvasElement | null>(null)
 const colors = ['#8b5cf6', '#3b82f6', '#ec4899'] // Purple, Blue, Pink
 const bgColors = ['rgba(139, 92, 246, 0.2)', 'rgba(59, 130, 246, 0.2)', 'rgba(236, 72, 153, 0.2)']

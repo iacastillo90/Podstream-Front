@@ -69,9 +69,9 @@ const fetchCategories = async () => {
       : (response as { data: unknown[] }).data || []
 
     categories.value = rawData.map((cat) => {
-      const c = cat as { name: string; description?: string; image?: string }
+      const c = cat as Category
       return {
-        ...cat,
+        ...c,
         // Fallback description if backend doesn't provide one
         description: c.description || `Explora nuestra colección de ${c.name}`,
         image: getFullImageUrl(c.image),
