@@ -115,7 +115,7 @@ const fetchOrders = async () => {
 
     // Filter for active/pending statuses
     // PENDING_PAYMENT, PAYMENT_CONFIRMED, SHIPPED, DELIVERED
-    pendingOrders.value = orders.filter((o: Order) =>
+    pendingOrders.value = (orders as Order[]).filter((o: Order) =>
       [
         'pending',
         'pending_payment',

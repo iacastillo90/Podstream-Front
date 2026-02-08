@@ -285,9 +285,9 @@ const fetchProduct = async () => {
 
     try {
       const reviewRes = await ReviewService.getAll(id as string)
-      product.value.reviewsList = Array.isArray(reviewRes)
-        ? reviewRes
-        : (reviewRes as { data?: unknown[] }).data || []
+      product.value.reviewsList = (
+        Array.isArray(reviewRes) ? reviewRes : (reviewRes as { data?: unknown[] }).data || []
+      ) as unknown[]
     } catch (e) {
       console.warn('Could not load reviews', e)
       product.value.reviewsList = []
@@ -314,10 +314,11 @@ const fetchRelated = async () => {
         image: getImageUrl(
           prod.image ||
             (prod.images && prod.images.length > 0 ? prod.images[0] : null) ||
-            (prod.photos && prod.photos.length > 0 ? prod.photos[0] : null),
+            (prod.photos && prod.photos.length > 0 ? prod.photos[0] : null) ||
+            '',
         ),
       }
-    })
+    }) as Product[]
   } catch (error) {
     console.warn('Error fetching recommendations:', error)
   }

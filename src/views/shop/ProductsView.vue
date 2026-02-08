@@ -223,7 +223,7 @@ const fetchProducts = async () => {
         // Brand is now real if backend sends it, otherwise fallback
         brand: prod.brand,
       }
-    })
+    }) as Product[]
 
     // Fetch Metadata for Sidebar based on CURRENT filters (to update counts)
     // Note: Usually metadata is fetched with the same query.
@@ -241,9 +241,15 @@ const fetchMetadata = async (activeFilters: Record<string, unknown>) => {
     // Update Sidebar props if meta is valid
     if (meta) {
       const metadata = meta as { categories?: unknown[]; maxPrice?: number; brands?: unknown[] }
-      if (metadata.categories) categories.value = metadata.categories
+      if (metadata.categories) {
+        categories.value = (metadata.categories as { name: string; count: number }[]).map(c => ({
+          id: 0, // Dummy ID to satisfy Category interface
+          name: c.name,
+          count: c.count
+        }))
+      }
       if (metadata.maxPrice) maxPriceLimit.value = metadata.maxPrice
-      if (metadata.brands) brands.value = metadata.brands
+      if (metadata.brands) brands.value = metadata.brands as { name: string; count: number }[]
     }
   } catch (e) {
     console.error('Error fetching metadata', e)
@@ -262,21 +268,29 @@ const fetchInitialData = async () => {
 }
 
 // Handler
+// Handler
 const handleFilterUpdate = (newFilters: Record<string, unknown>) => {
   // Map sidebar event structure to our state
   // Sidebar emits: { categories: [], brands: [], minPrice, maxPrice, inStock }
-  const filters = newFilters as {
+  const filtersData = newFilters as {
     categories?: number[]
     brands?: string[]
     minPrice?: number
     maxPrice?: number
     inStock?: boolean
   }
-  filters.value.category = filters.categories || []
-  filters.value.brand = filters.brands || []
-  filters.value.minPrice = filters.minPrice
-  filters.value.maxPrice = filters.maxPrice
-  filters.value.inStock = filters.inStock
+
+  // Access ref value
+  filters.value.category = filtersData.categories || []
+  filters.value.brand = filtersData.brands || []
+  filters.value.minPrice = filtersData.minPrice ?? null
+  filters.value.maxPrice = filtersData.maxPrice ?? null
+  filters.value.inStock = filtersData.inStock ?? false
+
+  // Reset page
+  // pagination.value.page = 0
+  fetchProducts()
+}
 
   fetchProducts()
 }

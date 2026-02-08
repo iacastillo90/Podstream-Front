@@ -107,7 +107,7 @@ const fetchOrders = async () => {
       : (response as { data?: unknown[] }).data || []
 
     // Filter for completed statuses
-    completedOrders.value = orders.filter((o: Order) =>
+    completedOrders.value = (orders as Order[]).filter((o: Order) =>
       ['delivered', 'cancelled', 'completed'].includes(o.status.toLowerCase()),
     )
   } catch (error) {
