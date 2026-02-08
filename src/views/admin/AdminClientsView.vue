@@ -287,9 +287,9 @@
                 class="flex justify-between items-center p-3 bg-white/5 rounded-lg border border-white/5"
               >
                 <span class="text-gray-400 text-sm">{{ purchase.date }}</span>
-                <span class="text-white font-mono font-medium"
-                  >${{ ((purchase as Record<string, unknown>).amount as number)?.toFixed(2) || '0.00' }}</span
-                >
+                <span class="text-white font-mono font-medium">
+                  ${{ ((purchase as Record<string, unknown>).amount as number)?.toFixed(2) || '0.00' }}
+                </span>
               </div>
             </div>
           </div>
