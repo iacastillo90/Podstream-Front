@@ -242,10 +242,10 @@ const fetchMetadata = async (activeFilters: Record<string, unknown>) => {
     if (meta) {
       const metadata = meta as { categories?: unknown[]; maxPrice?: number; brands?: unknown[] }
       if (metadata.categories) {
-        categories.value = (metadata.categories as { name: string; count: number }[]).map(c => ({
+        categories.value = (metadata.categories as { name: string; count: number }[]).map((c) => ({
           id: 0, // Dummy ID to satisfy Category interface
           name: c.name,
-          count: c.count
+          count: c.count,
         }))
       }
       if (metadata.maxPrice) maxPriceLimit.value = metadata.maxPrice
@@ -289,9 +289,6 @@ const handleFilterUpdate = (newFilters: Record<string, unknown>) => {
 
   // Reset page
   // pagination.value.page = 0
-  fetchProducts()
-}
-
   fetchProducts()
 }
 

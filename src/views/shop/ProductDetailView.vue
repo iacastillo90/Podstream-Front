@@ -287,7 +287,7 @@ const fetchProduct = async () => {
       const reviewRes = await ReviewService.getAll(id as string)
       product.value.reviewsList = (
         Array.isArray(reviewRes) ? reviewRes : (reviewRes as { data?: unknown[] }).data || []
-      ) as unknown[]
+      ) as any
     } catch (e) {
       console.warn('Could not load reviews', e)
       product.value.reviewsList = []
