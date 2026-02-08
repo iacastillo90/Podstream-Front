@@ -285,6 +285,7 @@ const fetchProduct = async () => {
 
     try {
       const reviewRes = await ReviewService.getAll(id as string)
+
       product.value.reviewsList = (
         Array.isArray(reviewRes) ? reviewRes : (reviewRes as { data?: unknown[] }).data || []
       ) as any
