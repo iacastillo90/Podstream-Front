@@ -288,7 +288,7 @@
               >
                 <span class="text-gray-400 text-sm">{{ purchase.date }}</span>
                 <span class="text-white font-mono font-medium">
-                  ${{ ((purchase as Record<string, unknown>).amount as number)?.toFixed(2) || '0.00' }}
+                  {{ formatPrice((purchase as any).amount) }}
                 </span>
               </div>
             </div>
@@ -322,6 +322,13 @@ const selectedStatus = ref('')
 const currentPage = ref(1)
 const itemsPerPage = 5
 const showDetailsModal = ref(false)
+
+const formatPrice = (amount: number | undefined | null) => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  }).format(amount || 0)
+}
 const selectedClient = ref<Client | null>(null)
 const clients = ref<Client[]>([])
 
