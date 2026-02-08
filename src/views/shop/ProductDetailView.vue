@@ -249,7 +249,7 @@ import { useRoute, useRouter } from 'vue-router'
 import api, { ReviewService, RecommendationService } from '@/services/api'
 import { useAuthStore } from '@/stores/auth' // Auth Store
 import { useCartStore } from '@/stores/cart'
-import type { Product } from '@/types'
+import type { Product, ProductReview } from '@/types'
 import GlassCard from '@/components/ui/GlassCard.vue'
 import AnimatedButton from '@/components/ui/AnimatedButton.vue'
 import ProductCard from '@/components/shop/ProductCard.vue'
@@ -286,9 +286,9 @@ const fetchProduct = async () => {
     try {
       const reviewRes = await ReviewService.getAll(id as string)
 
-      product.value.reviewsList = (
-        Array.isArray(reviewRes) ? reviewRes : (reviewRes as { data?: unknown[] }).data || []
-      ) as any
+      product.value.reviewsList = (Array.isArray(reviewRes)
+        ? reviewRes
+        : (reviewRes as { data?: unknown[] }).data || []) as unknown as ProductReview[]
     } catch (e) {
       console.warn('Could not load reviews', e)
       product.value.reviewsList = []
