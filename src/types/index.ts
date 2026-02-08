@@ -36,15 +36,6 @@ export interface Order {
   tax?: number
 }
 
-export interface ProductReview {
-  id: number
-  author: string
-  rating: number
-  comment: string
-  date: string
-  avatar?: string
-}
-
 export interface Promotion {
   id: number
   name: string

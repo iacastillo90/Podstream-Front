@@ -14,12 +14,21 @@ export interface Product {
   images?: string[]
   rating?: number
   reviews?: number
-  reviewsList?: import('./index').ProductReview[] // Avoid circular dep for now, or use ProductReview if imported
+  reviewsList?: ProductReview[]
   specifications?: { key: string; value: string }[]
   model3d_url?: string
   category?: Category // Optional populated field
   brand?: string
   categoryName?: string
+}
+
+export interface ProductReview {
+  id: number
+  author: string
+  rating: number
+  comment: string
+  date: string
+  avatar?: string
 }
 
 export interface Category {
